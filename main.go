@@ -20,55 +20,70 @@ func main() {
 		log.Printf("pkg %+v", pkg.Name)
 
 		for _, file := range pkg.Syntax {
-			// log.Printf("key %+v", file)
-
-			findPhotonQuery(file)
+			r := findPhotonQuery(file)
+			log.Printf("r: %+v", r)
 		}
 	}
 }
 
-func findPhotonQuery(node ast.Node) {
+type Result struct {
+	Name string
+}
+
+func findPhotonQuery(node *ast.File) (r Result) {
 	ast.Inspect(node, func(n ast.Node) bool {
-		// find photon call
-		ret, ok := n.(*ast.CallExpr)
-		if !ok {
-			return true
-		}
+		_, i, ok := findMethods(n, "Exec")
 
-		i, ok := ret.Fun.(*ast.SelectorExpr)
 		if !ok {
-			return true
-		}
-
-		if i.Sel.Name != "Exec" {
 			return true
 		}
 
 		log.Printf("found %+v", i.Sel)
 
+		r.Name = getName(i)
+
 		findFields(i)
+
+		return true
+	})
+	return
+}
+
+func findFields(node ast.Node) {
+	ast.Inspect(node, func(n ast.Node) bool {
+		_, i, ok := findMethods(n, "GroupBy", "Fields")
+		if !ok {
+			return true
+		}
+
+		log.Printf("n %+v", i.Sel.Name)
+
+		extractArguments(i)
 
 		return true
 	})
 }
 
-func findFields(node ast.Node) {
-	ast.Inspect(node, func(n ast.Node) bool {
-		ret, ok := n.(*ast.CallExpr)
+func getName(sel *ast.SelectorExpr) (str string) {
+	ast.Inspect(sel, func(n ast.Node) bool {
+		r, _, ok := findMethods(n, "Name")
 		if !ok {
 			return true
 		}
 
-		i, ok := ret.Fun.(*ast.SelectorExpr)
-		if !ok {
-			return true
-		}
+		arg := r.Args[0].(*ast.BasicLit)
 
-		if i.Sel.Name != "GroupBy" && i.Sel.Name != "Fields" {
-			return true
-		}
+		str = arg.Value
 
-		log.Printf("n %+v", i.Sel.Name)
+		return true
+	})
+	return
+}
+
+func extractArguments(sel *ast.SelectorExpr) {
+	ast.Inspect(sel, func(n ast.Node) bool {
+
+		// log.Printf("extracting args %+v", n)
 
 		return true
 	})
