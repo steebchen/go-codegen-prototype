@@ -65,6 +65,11 @@ func (r IntField) Sum() PostWhereOpts {
 type StringField struct {
 }
 
+// Select for advanced queries
+func (r StringField) Select() PostWhereOpts {
+	return PostWhereOpts{}
+}
+
 func (r StringField) Contains(str string) PostWhereOpts {
 	return PostWhereOpts{}
 }
@@ -73,6 +78,7 @@ func (r StringField) Equals(str string) PostWhereOpts {
 	return PostWhereOpts{}
 }
 
+// Select for advanced queries
 func (r StringField) Group() PostWhereOpts {
 	return PostWhereOpts{}
 }
@@ -178,6 +184,7 @@ func (r PostMethods) CreateMany(query []UserCreate) ([]PostObject, error) {
 }
 
 type PostQuery struct {
+	ID      StringField
 	Title   StringField
 	Content StringField
 	Likes   IntField

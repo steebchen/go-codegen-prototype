@@ -12,9 +12,10 @@ func example() {
 
 	var result interface{}
 	err := client.Post.Select.Name("UserQueryA").GroupBy(
-		Post.Title.Group(),
+		Post.ID.Group(),
+		Post.Title.Select(),
 	).Fields(
-		Post.Count(),
+		Post.Content.Select(),
 		Post.Likes.Sum(),
 	).Into(&result).Exec(context.Background())
 
