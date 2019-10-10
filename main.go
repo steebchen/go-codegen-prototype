@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"go/ast"
 	"log"
 	"os"
@@ -29,8 +30,21 @@ func main() {
 			l.Printf("r: %+v", r)
 			l.Printf("")
 			l.Printf("___________")
+			generate(r)
 		}
 	}
+}
+
+func generate(results []Result) {
+	var s string
+	for _, r := range results {
+		s += fmt.Sprintf("type %s struct {\n", r.Name)
+		for _, arg := range r.Args {
+			s += fmt.Sprintf("  %s %s\n", arg.Field, "string")
+		}
+		s += fmt.Sprintf("}\n")
+	}
+	log.Printf("struct: \n%s", s)
 }
 
 type Result struct {
@@ -127,7 +141,7 @@ func extractArguments(sel *ast.SelectorExpr) []Arg {
 				continue
 			}
 
-			// method can be Select, Group, etc.
+			// method can be SelectParent, Group, etc.
 			method, ok := a.Fun.(*ast.SelectorExpr)
 			if !ok {
 				continue

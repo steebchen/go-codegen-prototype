@@ -5,7 +5,6 @@ import (
 )
 
 func findMethod(node ast.Node, name string) (*ast.CallExpr, *ast.SelectorExpr, bool) {
-	// find photon call
 	ret, ok := node.(*ast.CallExpr)
 	if !ok {
 		return nil, nil, false
