@@ -51,6 +51,17 @@ func (o PostObject) Stuff() (string, bool) {
 	return o.stuff.Value, o.stuff.Valid
 }
 
+type IntField struct {
+}
+
+func (r IntField) Equals(v int) PostWhereOpts {
+	return PostWhereOpts{}
+}
+
+func (r IntField) Sum() PostWhereOpts {
+	return PostWhereOpts{}
+}
+
 type StringField struct {
 }
 
@@ -59,6 +70,10 @@ func (r StringField) Contains(str string) PostWhereOpts {
 }
 
 func (r StringField) Equals(str string) PostWhereOpts {
+	return PostWhereOpts{}
+}
+
+func (r StringField) Group() PostWhereOpts {
 	return PostWhereOpts{}
 }
 
@@ -87,12 +102,16 @@ type ClientStruct struct {
 type PostMethods struct {
 	FindOne  PostMethodsFindOne
 	FindMany PostMethodsFindMany
+	Select   PostMethodsSelect
 }
 
 type PostMethodsFindOne struct {
 }
 
 type PostMethodsFindMany struct {
+}
+
+type PostMethodsSelect struct {
 }
 
 func (r PostMethodsFindOne) ID(id string) PostMethodsFindOne {
@@ -125,6 +144,26 @@ func (r PostMethodsFindMany) Exec(ctx context.Context) ([]PostObject, error) {
 	}}, nil
 }
 
+func (r PostMethodsSelect) Name(name string) PostMethodsSelect {
+	return r
+}
+
+func (r PostMethodsSelect) Into(v interface{}) PostMethodsSelect {
+	return r
+}
+
+func (r PostMethodsSelect) Exec(ctx context.Context) error {
+	return nil
+}
+
+func (r PostMethodsSelect) Fields(query ...PostWhereOpts) PostMethodsSelect {
+	return r
+}
+
+func (r PostMethodsSelect) GroupBy(query ...PostWhereOpts) PostMethodsSelect {
+	return r
+}
+
 // CreateOne specifies options to create a user.
 // This can be used with the fluent API:
 //  CreateOne(photon.Post.CreateOne(user.Content("todo")))
@@ -141,12 +180,17 @@ func (r PostMethods) CreateMany(query []UserCreate) ([]PostObject, error) {
 type PostQuery struct {
 	Title   StringField
 	Content StringField
+	Likes   IntField
 
 	Comments CommentQuery
 }
 
 type CommentQuery struct {
 	Content StringField
+}
+
+func (r PostQuery) Count() PostWhereOpts {
+	return PostWhereOpts{}
 }
 
 func (r PostQuery) Where(where PostWhereOpts) PostOneQuery {
