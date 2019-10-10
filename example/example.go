@@ -8,7 +8,6 @@ import (
 )
 
 func example() {
-	ctx := context.Background()
 	client := NewClient()
 
 	var result interface{}
@@ -17,7 +16,7 @@ func example() {
 	).Fields(
 		Post.Count(),
 		Post.Likes.Sum(),
-	).Into(&result).Exec(ctx)
+	).Into(&result).Exec(context.Background())
 
 	log.Printf("err: %s", err)
 }
