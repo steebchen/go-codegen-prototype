@@ -84,14 +84,9 @@ import (
 		s += fmt.Sprintf(`
 // Exec runs the query and returns a result and an error
 func (r PostMethodsSelect) Exec(ctx context.Context) ([]%s, error) {
-	return []UserQueryA{{
-		ID:        "123",
-		Title:     "My Post",
-		Likes:     "50",
-		PostCount: 5,
-	}}, nil
+	return []%s{}, nil
 }
-`, r.Name)
+`, r.Name, r.Name)
 	}
 	log.Printf("struct: \n%s", s)
 
@@ -114,8 +109,14 @@ func findPhotonQuery(node *ast.File) []Result {
 		}
 
 		var r Result
-		r.Name = getName(i)
 		r.Args = findFields(i)
+		r.Name = getName(i)
+		if r.Name == "" {
+			for _, a := range r.Args {
+				r.Name += fmt.Sprintf("%s", a.Field)
+			}
+			r.Name += "Query"
+		}
 		s = append(s, r)
 
 		return true
@@ -163,6 +164,10 @@ func getName(sel *ast.SelectorExpr) string {
 
 		return true
 	})
+
+	if str == "" {
+		return str
+	}
 
 	// cut off quotes
 	return str[1 : len(str)-1]
