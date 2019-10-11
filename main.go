@@ -54,13 +54,7 @@ func writeFile(s string) error {
 }
 
 func generate(results []Result) string {
-	s := `package photon
-
-import (
-	"context"
-)
-
-`
+	s := "package photon\n\n"
 
 	for _, r := range results {
 		s += fmt.Sprintf("type %s struct {\n", r.Name)
@@ -79,16 +73,9 @@ import (
 			s += fmt.Sprintf("  // %s %s.\n", arg.Field, desc)
 			s += fmt.Sprintf("  %s %s\n", arg.Field, arg.Type)
 		}
-		s += fmt.Sprintf("}\n")
-
-		s += fmt.Sprintf(`
-// Exec runs the query and returns a result and an error
-func (r PostMethodsSelect) Exec(ctx context.Context) ([]%s, error) {
-	return []%s{}, nil
-}
-`, r.Name, r.Name)
+		s += fmt.Sprintf("}\n\n")
 	}
-	log.Printf("struct: \n%s", s)
+	l.Printf("struct: \n```\n%s\n```\n", s)
 
 	return s
 }

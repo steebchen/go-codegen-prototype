@@ -150,6 +150,11 @@ func (r PostMethodsFindMany) Exec(ctx context.Context) ([]PostObject, error) {
 	}}, nil
 }
 
+// Exec runs the query and returns a result and an error
+func (r PostMethodsSelect) Exec(ctx context.Context) error {
+	return nil
+}
+
 func (r PostMethodsSelect) Name(name string) PostMethodsSelect {
 	return r
 }
