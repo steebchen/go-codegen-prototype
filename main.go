@@ -80,12 +80,12 @@ func findFields(node *ast.SelectorExpr) []Arg {
 
 	ast.Inspect(node, func(n ast.Node) bool {
 
-		if _, i, ok := findMethod(n, "Fields"); ok {
-			args = append(args, extractArguments(i)...)
+		if r, _, ok := findMethod(n, "Fields"); ok {
+			args = append(args, extractArguments(r)...)
 		}
 
-		if _, i, ok := findMethod(n, "GroupBy"); ok {
-			args = append(args, extractArguments(i)...)
+		if r, _, ok := findMethod(n, "GroupBy"); ok {
+			args = append(args, extractArguments(r)...)
 		}
 
 		return true
@@ -123,58 +123,47 @@ type Arg struct {
 	Collection string
 }
 
-func extractArguments(sel *ast.SelectorExpr) []Arg {
+func extractArguments(node *ast.CallExpr) []Arg {
 	var args []Arg
 
-	ast.Inspect(sel, func(n ast.Node) bool {
-		log.Printf("1 %+v", n)
-		call, ok := n.(*ast.CallExpr)
+	l.Printf("extracting arguments of %+v", node.Fun.(*ast.SelectorExpr).Sel.Name)
 
+	for _, arg := range node.Args {
+		a, ok := arg.(*ast.CallExpr)
 		if !ok {
-			return true
+			continue
 		}
 
-		l.Printf("extracting arguments of %+v", call.Fun.(*ast.SelectorExpr).Sel.Name)
+		// method can be SelectParent, Group, etc.
+		method, ok := a.Fun.(*ast.SelectorExpr)
+		if !ok {
+			continue
+		}
 
-		for _, arg := range call.Args {
-			a, ok := arg.(*ast.CallExpr)
+		var field string
+		var col string
+
+		switch x := method.X.(type) {
+		case *ast.Ident:
+			field = x.Name + "Count"
+		case *ast.SelectorExpr:
+			field = x.Sel.Name
+			f, ok := x.X.(*ast.Ident)
 			if !ok {
 				continue
 			}
-
-			// method can be SelectParent, Group, etc.
-			method, ok := a.Fun.(*ast.SelectorExpr)
-			if !ok {
-				continue
-			}
-
-			var field string
-			var col string
-
-			switch x := method.X.(type) {
-			case *ast.Ident:
-				field = x.Name
-			case *ast.SelectorExpr:
-				field = x.Sel.Name
-				f, ok := x.X.(*ast.Ident)
-				if !ok {
-					continue
-				}
-				col = f.Name
-			}
-
-			args = append(args, Arg{
-				Origin:     method.Sel.Name,
-				Field:      field,
-				Collection: col,
-			})
-
+			col = f.Name
 		}
 
-		l.Printf("args len %d", len(args))
+		args = append(args, Arg{
+			Origin:     method.Sel.Name,
+			Field:      field,
+			Collection: col,
+		})
 
-		return true
-	})
+	}
+
+	l.Printf("args len %d", len(args))
 
 	return args
 }

@@ -10,14 +10,23 @@ import (
 func example() {
 	client := NewClient()
 
-	var result interface{}
+	var result UserQueryA
 	err := client.Post.SelectParent.Name("UserQueryA").Fields(
-		Post.ID.Group(),
+		Post.ID.Select(),
 		Post.Title.Select(),
-	).GroupBy(
-		Post.Content.Select(),
 		Post.Likes.Sum(),
+		Post.Count(),
+	).GroupBy(
+		Post.ID.Group(),
 	).Into(&result).Exec(context.Background())
 
 	log.Printf("err: %s", err)
+}
+
+type UserQueryA struct {
+	ID        string
+	Title     string
+	Content   string
+	Likes     string
+	PostCount string
 }
