@@ -15,7 +15,7 @@ func main() {
 	// FROM Posts
 	// GROUP BY title
 
-	var result []Query1
+	var result Query1
 	err := client.Post.Select.Name("Query1").Fields(
 		Post.Likes.Sum(),
 		Post.Count(),
@@ -23,7 +23,7 @@ func main() {
 		Post.Title.Group(),
 	).Into(&result).Exec(context.Background())
 
-	var countResult []CountQuery
+	var countResult CountQuery
 	err = client.Post.Select.Name("CountQuery").Fields(
 		Post.Count(),
 	).Into(&countResult).Exec(context.Background())
@@ -39,5 +39,5 @@ func main() {
 		log.Printf("posts: %d", item.PostCount)
 	}
 
-	log.Printf("count: %s", countResult[0].PostCount)
+	log.Printf("count: %d", countResult[0].PostCount)
 }

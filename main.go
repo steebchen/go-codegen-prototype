@@ -57,7 +57,7 @@ func generate(results []Result) string {
 	s := "package photon\n\n"
 
 	for _, r := range results {
-		s += fmt.Sprintf("type %s struct {\n", r.Name)
+		s += fmt.Sprintf("type %sItem struct {\n", r.Name)
 		for _, arg := range r.Args {
 			var desc string
 			switch arg.Origin {
@@ -74,6 +74,7 @@ func generate(results []Result) string {
 			s += fmt.Sprintf("  %s %s\n", arg.Field, arg.Type)
 		}
 		s += fmt.Sprintf("}\n\n")
+		s += fmt.Sprintf("type %s []%sItem\n\n", r.Name, r.Name)
 	}
 	l.Printf("struct: \n```\n%s\n```\n", s)
 
