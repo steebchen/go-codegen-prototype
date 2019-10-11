@@ -1,4 +1,4 @@
-package example
+package main
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	. "go-codegen/example/photon"
 )
 
-func example() {
+func main() {
 	client := NewClient()
 
 	query, err := client.Post.SelectParent.Name("UserQueryA").Fields(
@@ -22,8 +22,10 @@ func example() {
 		panic(err)
 	}
 
-	log.Printf("query: %s", query)
-	log.Printf("title: %s", query.Title)
-	log.Printf("likes: %s", query.Likes)
-	log.Printf("posts: %s", query.PostCount)
+	for _, item := range query {
+		log.Printf("item: %+v", item)
+		log.Printf("title: %s", item.Title)
+		log.Printf("likes: %d", item.Likes)
+		log.Printf("posts: %d", item.PostCount)
+	}
 }

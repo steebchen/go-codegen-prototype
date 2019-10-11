@@ -65,14 +65,19 @@ import (
 	for _, r := range results {
 		s += fmt.Sprintf("type %s struct {\n", r.Name)
 		for _, arg := range r.Args {
-			s += fmt.Sprintf("  %s %s\n", arg.Field, "string")
+			s += fmt.Sprintf("  %s %s\n", arg.Field, arg.Type)
 		}
 		s += fmt.Sprintf("}\n")
 
 		s += fmt.Sprintf(`
 // Exec runs the query and returns a result and an error
-func (r PostMethodsSelect) Exec(ctx context.Context) (*%s, error) {
-	return nil, nil
+func (r PostMethodsSelect) Exec(ctx context.Context) ([]%s, error) {
+	return []UserQueryA{{
+		ID:        "123",
+		Title:     "My Post",
+		Likes:     "50",
+		PostCount: 5,
+	}}, nil
 }
 `, r.Name)
 	}
@@ -155,6 +160,7 @@ type Arg struct {
 	Origin     string
 	Field      string
 	Collection string
+	Type       string
 }
 
 func extractArguments(node *ast.CallExpr) []Arg {
@@ -176,11 +182,14 @@ func extractArguments(node *ast.CallExpr) []Arg {
 
 		var field string
 		var col string
+		var typ string
 
 		switch x := method.X.(type) {
 		case *ast.Ident:
 			field = x.Name + "Count"
+			typ = "int"
 		case *ast.SelectorExpr:
+			typ = "string"
 			field = x.Sel.Name
 			f, ok := x.X.(*ast.Ident)
 			if !ok {
@@ -189,9 +198,15 @@ func extractArguments(node *ast.CallExpr) []Arg {
 			col = f.Name
 		}
 
+		// temporarily hardcoded since we don't have type information yet
+		if field == "Likes" {
+			typ = "int"
+		}
+
 		args = append(args, Arg{
 			Origin:     method.Sel.Name,
 			Field:      field,
+			Type:       typ,
 			Collection: col,
 		})
 

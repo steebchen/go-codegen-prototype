@@ -218,7 +218,7 @@ func (r PostQuery) New() UserCreate {
 
 func (r PostQuery) Relation(where UserCreateOpts) UserCreate {
 	return UserCreate{
-		nil,
+		PostObject{},
 		where,
 	}
 }
