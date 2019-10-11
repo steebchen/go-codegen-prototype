@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go/ast"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -30,21 +31,54 @@ func main() {
 			l.Printf("r: %+v", r)
 			l.Printf("")
 			l.Printf("___________")
-			generate(r)
+
+			str := generate(r)
+			err := writeFile(str)
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 }
 
-func generate(results []Result) {
-	var s string
+func writeFile(s string) error {
+	b := []byte(s)
+	perm := os.FileMode(0644)
+
+	err := ioutil.WriteFile("./example/photon/structs_gen.go", b, perm)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func generate(results []Result) string {
+	s := `package photon
+
+import (
+	"context"
+)
+
+`
+
 	for _, r := range results {
 		s += fmt.Sprintf("type %s struct {\n", r.Name)
 		for _, arg := range r.Args {
 			s += fmt.Sprintf("  %s %s\n", arg.Field, "string")
 		}
 		s += fmt.Sprintf("}\n")
+
+		s += fmt.Sprintf(`
+// Exec runs the query and returns a result and an error
+func (r PostMethodsSelect) Exec(ctx context.Context) (*%s, error) {
+	return nil, nil
+}
+`, r.Name)
 	}
 	log.Printf("struct: \n%s", s)
+
+	return s
 }
 
 type Result struct {

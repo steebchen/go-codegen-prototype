@@ -158,10 +158,6 @@ func (r PostMethodsSelect) Into(v interface{}) PostMethodsSelect {
 	return r
 }
 
-func (r PostMethodsSelect) Exec(ctx context.Context) error {
-	return nil
-}
-
 func (r PostMethodsSelect) Fields(query ...PostWhereOpts) PostMethodsSelect {
 	return r
 }

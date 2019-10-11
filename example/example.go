@@ -10,23 +10,20 @@ import (
 func example() {
 	client := NewClient()
 
-	var result UserQueryA
-	err := client.Post.SelectParent.Name("UserQueryA").Fields(
-		Post.ID.Select(),
+	query, err := client.Post.SelectParent.Name("UserQueryA").Fields(
 		Post.Title.Select(),
 		Post.Likes.Sum(),
 		Post.Count(),
 	).GroupBy(
 		Post.ID.Group(),
-	).Into(&result).Exec(context.Background())
+	).Exec(context.Background())
 
-	log.Printf("err: %s", err)
-}
+	if err != nil {
+		panic(err)
+	}
 
-type UserQueryA struct {
-	ID        string
-	Title     string
-	Content   string
-	Likes     string
-	PostCount string
+	log.Printf("query: %s", query)
+	log.Printf("title: %s", query.Title)
+	log.Printf("likes: %s", query.Likes)
+	log.Printf("posts: %s", query.PostCount)
 }
