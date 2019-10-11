@@ -113,7 +113,8 @@ func getName(sel *ast.SelectorExpr) string {
 		return true
 	})
 
-	return str
+	// cut off quotes
+	return str[1 : len(str)-1]
 }
 
 type Arg struct {
