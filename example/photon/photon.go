@@ -65,7 +65,7 @@ func (r IntField) Sum() PostWhereOpts {
 type StringField struct {
 }
 
-// SelectParent for advanced queries
+// Select for advanced queries
 func (r StringField) Select() PostWhereOpts {
 	return PostWhereOpts{}
 }
@@ -78,7 +78,7 @@ func (r StringField) Equals(str string) PostWhereOpts {
 	return PostWhereOpts{}
 }
 
-// SelectParent for advanced queries
+// Select for advanced queries
 func (r StringField) Group() PostWhereOpts {
 	return PostWhereOpts{}
 }
@@ -106,9 +106,9 @@ type ClientStruct struct {
 }
 
 type PostMethods struct {
-	FindOne      PostMethodsFindOne
-	FindMany     PostMethodsFindMany
-	SelectParent PostMethodsSelect
+	FindOne  PostMethodsFindOne
+	FindMany PostMethodsFindMany
+	Select   PostMethodsSelect
 }
 
 type PostMethodsFindOne struct {

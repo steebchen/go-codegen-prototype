@@ -65,6 +65,18 @@ import (
 	for _, r := range results {
 		s += fmt.Sprintf("type %s struct {\n", r.Name)
 		for _, arg := range r.Args {
+			var desc string
+			switch arg.Origin {
+			case "Sum":
+				desc = "is the sum of integer values of selected rows"
+			case "Group":
+				desc = "was grouped by"
+			case "Count":
+				desc = "is the total count of results"
+			case "Select":
+				desc = "was selected"
+			}
+			s += fmt.Sprintf("  // %s %s.\n", arg.Field, desc)
 			s += fmt.Sprintf("  %s %s\n", arg.Field, arg.Type)
 		}
 		s += fmt.Sprintf("}\n")
@@ -174,7 +186,7 @@ func extractArguments(node *ast.CallExpr) []Arg {
 			continue
 		}
 
-		// method can be SelectParent, Group, etc.
+		// method can be Select, Group, etc.
 		method, ok := a.Fun.(*ast.SelectorExpr)
 		if !ok {
 			continue

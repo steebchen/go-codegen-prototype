@@ -10,12 +10,11 @@ import (
 func main() {
 	client := NewClient()
 
-	query, err := client.Post.SelectParent.Name("UserQueryA").Fields(
-		Post.Title.Select(),
+	query, err := client.Post.Select.Name("UserQueryA").Fields(
 		Post.Likes.Sum(),
 		Post.Count(),
 	).GroupBy(
-		Post.ID.Group(),
+		Post.Title.Group(),
 	).Exec(context.Background())
 
 	if err != nil {
