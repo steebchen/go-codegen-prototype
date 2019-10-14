@@ -16,7 +16,6 @@ func findMethod(node ast.Node, name string) (*ast.CallExpr, *ast.SelectorExpr, b
 	}
 
 	if i.Sel.Name == name {
-		l.Printf("found method %s", name)
 		return ret, i, true
 	}
 

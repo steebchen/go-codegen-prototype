@@ -16,21 +16,25 @@ func main() {
 	// FROM Posts
 	// GROUP BY title
 
-	var result Query1
-	err := client.Post.Select.Name("Query1").Fields(
+	// default query API
+	user, err := client.Post.FindOne.Where(
+		Post.Title.Equals("welcome"),
+	).Exec(ctx)
+	log.Printf("user, err %+v %s", user, err)
+
+	// advanced aggregation/order by query
+	var result MyQuery1
+	err = client.Post.Select.Name("MyQuery1").Fields(
 		Post.Likes.Sum(),
-		Post.Count(),
 	).GroupBy(
 		Post.Title.Group(),
 	).Into(&result).Exec(ctx)
-
 	if err != nil {
 		panic(err)
 	}
 
 	for _, item := range result {
-		log.Printf("item: %+v", item)
+		log.Printf("title: %s", item.Title)
 		log.Printf("likes: %d", item.Likes)
-		log.Printf("posts: %d", item.PostCount)
 	}
 }
