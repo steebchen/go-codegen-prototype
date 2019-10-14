@@ -9,6 +9,7 @@ import (
 
 func main() {
 	client := NewClient()
+	ctx := context.Background()
 
 	// sql equivalent:
 	// SELECT sum(likes), count(id)
@@ -21,12 +22,7 @@ func main() {
 		Post.Count(),
 	).GroupBy(
 		Post.Title.Group(),
-	).Into(&result).Exec(context.Background())
-
-	var countResult CountQuery
-	err = client.Post.Select.Name("CountQuery").Fields(
-		Post.Count(),
-	).Into(&countResult).Exec(context.Background())
+	).Into(&result).Exec(ctx)
 
 	if err != nil {
 		panic(err)
@@ -34,10 +30,7 @@ func main() {
 
 	for _, item := range result {
 		log.Printf("item: %+v", item)
-		log.Printf("title: %s", item.Title)
 		log.Printf("likes: %d", item.Likes)
 		log.Printf("posts: %d", item.PostCount)
 	}
-
-	log.Printf("count: %d", countResult[0].PostCount)
 }
